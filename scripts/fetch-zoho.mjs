@@ -35,8 +35,14 @@ const REQUIRED_ENV = [
   "ZOHO_EVENT_ID",
 ];
 
-const ACCOUNTS = process.env.ZOHO_ACCOUNTS_DOMAIN ?? "https://accounts.zoho.com";
-const API = process.env.ZOHO_API_DOMAIN ?? "https://www.zohoapis.com";
+function envOr(name, fallback) {
+  const v = process.env[name];
+  if (v === undefined || v === null || v.trim() === "") return fallback;
+  return v.trim().replace(/\/+$/, "");
+}
+
+const ACCOUNTS = envOr("ZOHO_ACCOUNTS_DOMAIN", "https://accounts.zoho.com");
+const API = envOr("ZOHO_API_DOMAIN", "https://www.zohoapis.com");
 
 function requireEnv() {
   const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
@@ -53,7 +59,9 @@ async function mintAccessToken() {
     client_secret: process.env.ZOHO_CLIENT_SECRET,
     grant_type: "refresh_token",
   });
-  const res = await fetch(`${ACCOUNTS}/oauth/v2/token`, {
+  const url = `${ACCOUNTS}/oauth/v2/token`;
+  console.log(`Token endpoint: ${url}`);
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
