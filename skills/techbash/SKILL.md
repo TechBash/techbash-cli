@@ -121,8 +121,8 @@ Sponsor and ticket data come from committed JSON snapshots that organizers refre
 
 | File | Content |
 | --- | --- |
-| `skills/techbash/data/sponsors.json` | `{ event, source, fetchedAt, sponsors[] }` — each sponsor has `id, name, tier, description, websiteUrl, logoUrl`. |
-| `skills/techbash/data/tickets.json` | `{ event, source, fetchedAt, tickets[] }` — each ticket has `id, name, description, price, currency, saleStartsAt, saleEndsAt, isSoldOut, isAvailable`. |
+| `skills/techbash/data/sponsors.json` | `{ event, source, fetchedAt, sponsors[] }` — each sponsor has `id, name, tier, description, websiteUrl`. The description may contain HTML; strip tags before display. |
+| `skills/techbash/data/tickets.json` | `{ event, source, fetchedAt, tickets[] }` — each ticket has `id, name, description, price, currency, quantity, sold, saleStartsAt, saleEndsAt, status, isSoldOut, isAvailable`. `price` is a number in the units of `currency` (e.g. `999` + `USD` means $999). |
 
 When answering sponsor/ticket questions:
 
@@ -226,16 +226,18 @@ Stack: Node 22, TypeScript, Azure Functions, GitHub Actions
 
 1. Read `skills/techbash/data/sponsors.json`.
 2. If empty or `fetchedAt` is null, say "Sponsor list is not in the snapshot yet — see <https://techbash.com> for the current sponsor list." and stop.
-3. Group sponsors by `tier` (preserve any order present in the file; otherwise alphabetize by tier then by name).
-4. For each sponsor return name + one-line description (truncate longer descriptions) and the `websiteUrl` if present. Mention the `fetchedAt` timestamp at the bottom.
+3. Group sponsors by `tier` (preserve any order present in the file; otherwise sort tiers in conventional order — Platinum, Gold, Silver, Bronze, Community — falling back to alphabetical for unknown tiers; alphabetize sponsors within a tier by `name`).
+4. For each sponsor return `name` + one-line description (strip HTML tags from `description` and truncate longer descriptions to ~200 chars) and the `websiteUrl` if present.
+5. The snapshot does not include sponsor logos — for logos, direct the user to <https://techbash.com>. Mention the `fetchedAt` timestamp at the bottom.
 
 ### "What ticket types are available?" / "How much is a TechBash ticket?"
 
 1. Read `skills/techbash/data/tickets.json`.
 2. If empty or `fetchedAt` is null, say "Ticket data is not in the snapshot yet — see <https://techbash.zohobackstage.com/TechBash2026>." and stop.
-3. List ticket types with name, description (truncated), and price formatted as `<price> <currency>`.
-4. Flag any ticket where `isSoldOut === true` as **SOLD OUT** at the top of its entry.
-5. Mention the `fetchedAt` timestamp and always close with "To buy, transfer, or refund tickets, go to <https://techbash.zohobackstage.com/TechBash2026>."
+3. List ticket types with `name`, description (strip HTML, truncate), and price formatted as `<price> <currency>` (e.g. `$999 USD`). If `currency` is null, just print the number.
+4. Flag any ticket where `isSoldOut === true` as **SOLD OUT** at the top of its entry. If `isSoldOut` is false and both `quantity` and `sold` are present, you may add a parenthetical "(N of M left)" where helpful.
+5. If `status` is something other than `active` (e.g. `inactive`, `hidden`), de-emphasize or omit those tickets from the main list — they are not currently for sale.
+6. Mention the `fetchedAt` timestamp and always close with "To buy, transfer, or refund tickets, go to <https://techbash.zohobackstage.com/TechBash2026>."
 
 ## Guardrails
 

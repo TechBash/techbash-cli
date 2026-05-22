@@ -88,30 +88,51 @@ async function zohoGet(path, token) {
 }
 
 // Allowlist-based sanitization — anything not listed here is dropped, so a
-// schema change at Zoho cannot accidentally leak new fields into the
-// public repo.
+// schema change at Zoho cannot accidentally leak new fields (e.g. PII from
+// `contact` or `created_by`) into the public repo.
 function sanitizeSponsor(raw) {
   return {
     id: raw.id ?? null,
-    name: raw.name ?? raw.companyName ?? null,
-    tier: raw.tier ?? raw.level ?? raw.sponsorshipLevel ?? null,
-    description: raw.description ?? raw.about ?? null,
-    websiteUrl: raw.websiteUrl ?? raw.website ?? raw.url ?? null,
-    logoUrl: raw.logoUrl ?? raw.logo ?? raw.image ?? null,
+    name: raw.company_name ?? raw.name ?? null,
+    tier: raw.sponsorship_type_name ?? raw.tier ?? null,
+    description: raw.description ?? null,
+    websiteUrl: raw.website_url ?? raw.websiteUrl ?? null,
   };
 }
 
 function sanitizeTicket(raw) {
+  const quantity = raw.quantity ?? null;
+  const sold = raw.sold ?? null;
+  const statusString = raw.status_string ?? null;
+  const hidden = raw.hidden ?? null;
+
+  const isSoldOut =
+    statusString === "sold_out"
+      ? true
+      : typeof quantity === "number" && typeof sold === "number"
+        ? sold >= quantity
+        : null;
+
+  const isAvailable =
+    statusString === "active" && hidden === false
+      ? true
+      : statusString != null || hidden != null
+        ? false
+        : null;
+
   return {
     id: raw.id ?? null,
-    name: raw.name ?? raw.ticketName ?? null,
+    name: raw.name ?? null,
     description: raw.description ?? null,
-    price: raw.price ?? raw.amount ?? null,
-    currency: raw.currency ?? raw.currencyCode ?? null,
-    saleStartsAt: raw.saleStartsAt ?? raw.salesStart ?? null,
-    saleEndsAt: raw.saleEndsAt ?? raw.salesEnd ?? null,
-    isSoldOut: raw.isSoldOut ?? raw.soldOut ?? null,
-    isAvailable: raw.isAvailable ?? null,
+    price: raw.amount ?? raw.price ?? null,
+    currency: raw.currency_code ?? raw.currency ?? null,
+    quantity,
+    sold,
+    saleStartsAt: raw.sales_start_date ?? null,
+    saleEndsAt: raw.sales_end_date ?? null,
+    status: statusString,
+    isSoldOut,
+    isAvailable,
   };
 }
 
