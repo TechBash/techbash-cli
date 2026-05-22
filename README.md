@@ -87,6 +87,16 @@ No API keys required. Data is fetched live; the agent should cache responses for
 - **Not offline:** Requires network access to query the Sessionize catalog.
 - **Not a replacement for the event app** — a developer-first complement.
 
+## Documentation
+
+Full docs live in [`docs/`](./docs/README.md):
+
+- [Installation](./docs/installation.md) — Copilot CLI, Claude Code, manual install
+- [Getting started](./docs/getting-started.md) — your first 5 minutes
+- [Workflow recipes](./docs/workflows.md) — every supported workflow in detail
+- [Event reference](./docs/event.md) — dates, venue, tracks, travel
+- [FAQ](./docs/faq.md) — privacy, troubleshooting, limitations
+
 ## Contributing
 
 Issues and PRs welcome. See [`AGENTS.md`](./AGENTS.md) for repo structure and contribution conventions.
