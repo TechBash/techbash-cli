@@ -1,6 +1,31 @@
 {
   "event": "TechBash 2026",
   "source": "Zoho Backstage v3",
-  "fetchedAt": null,
-  "sponsors": []
+  "fetchedAt": "2026-05-22T21:45:35.036Z",
+  "sponsors": [
+    {
+      "id": "153436000001261060",
+      "name": null,
+      "tier": null,
+      "description": "<p>Proven AI DevOps for .NET Teams That Can't Afford to Fail - Accelerate AI adoption for faster, reliable software delivery. Turn AI experimentation into predictable, high-quality outcomes so your AI investment delivers the ROI it promised.</p>",
+      "websiteUrl": null,
+      "logoUrl": null
+    },
+    {
+      "id": "153436000001261040",
+      "name": null,
+      "tier": null,
+      "description": "<p>Proven AI DevOps for .NET Teams That Can't Afford to Fail - Accelerate AI adoption for faster, reliable software delivery. Turn AI experimentation into predictable, high-quality outcomes so your AI investment delivers the ROI it promised.</p>",
+      "websiteUrl": null,
+      "logoUrl": null
+    },
+    {
+      "id": "153436000001233003",
+      "name": null,
+      "tier": null,
+      "description": "<p>Proven AI DevOps for .NET Teams That Can't Afford to Fail - Accelerate AI adoption for faster, reliable software delivery. Turn AI experimentation into predictable, high-quality outcomes so your AI investment delivers the ROI it promised.</p>",
+      "websiteUrl": null,
+      "logoUrl": null
+    }
+  ]
 }
