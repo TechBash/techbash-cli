@@ -65,7 +65,7 @@ Tickets are managed in Zoho Backstage:
 
 The skill will direct you there for any ticketing action — buying, transferring, refunding. **It cannot register you itself.**
 
-> Sponsor and ticket data via the Zoho Backstage API is on the [roadmap](./README.md#start-here) for a future release.
+> Sponsor and ticket-type data via the Zoho Backstage API are supported in v0.2+. The data is a manually refreshed snapshot committed to the repo — see [Workflows — Sponsors and tickets](./workflows.md#whos-sponsoring-techbash--what-ticket-types-are-available) and (for organizers) [`docs/zoho-setup.md`](./zoho-setup.md).
 
 ## Sessionize event ID
 

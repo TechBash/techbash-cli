@@ -3,19 +3,24 @@ name: techbash
 description: >-
   Your companion for TechBash 2026. Helps developers find sessions relevant to
   their project, look up speakers, plan a personal schedule, capture notes
-  during the event, and draft trip reports after. Activate when the user
-  mentions TechBash, conference sessions/schedule for TechBash, Kalahari
-  Resort, Pocono Manor, or a TechBash speaker by name. Uses the live
-  Sessionize catalog (no API keys required).
+  during the event, draft trip reports after, and answer sponsor and ticket
+  questions from the organizer-maintained Zoho Backstage snapshot. Activate
+  when the user mentions TechBash, conference sessions/schedule for TechBash,
+  Kalahari Resort, Pocono Manor, a TechBash speaker by name, TechBash
+  sponsors, or TechBash tickets. Uses the live Sessionize catalog (no API
+  keys required) plus committed snapshot files for Zoho-sourced data.
 license: MIT
 compatibility: >-
   Uses direct HTTPS fetch against the public Sessionize endpoints for TechBash
-  2026 (no auth required). A future @techbash/events-cli helper may provide
+  2026 (no auth required). Sponsor and ticket data come from committed JSON
+  snapshots under skills/techbash/data/ that are refreshed by a maintainer-run
+  GitHub Action — the skill never talks to Zoho directly, and end users never
+  need Zoho credentials. A future @techbash/events-cli helper may provide
   local caching and faster fuzzy search; until then, fetch the All view once
   per conversation and filter in-context.
 metadata:
   author: TechBash organizers
-  version: "0.1"
+  version: "0.2"
   domain: techbash
 ---
 
@@ -83,6 +88,7 @@ Activate when the user:
 - Asks "what's on the workshop day?" or "what's Family Day?"
 - Asks to find sessions that match their project, dependencies, or tech stack for TechBash
 - Wants to log notes from a session or draft a trip report
+- Asks about TechBash **sponsors** or **ticket types / prices**
 
 Do not activate when the user:
 
@@ -108,6 +114,22 @@ curl -s https://sessionize.com/api/v2/hppwa4hg/view/GridSmart
 ```
 
 Fetch each endpoint **at most once per conversation** and reuse the result. If the user asks a follow-up that needs the same data, do not re-fetch.
+
+## Sponsor and ticket data (from local snapshot)
+
+Sponsor and ticket data come from committed JSON snapshots that organizers refresh manually via a GitHub Action — they are not fetched live and may be slightly out of date.
+
+| File | Content |
+| --- | --- |
+| `skills/techbash/data/sponsors.json` | `{ event, source, fetchedAt, sponsors[] }` — each sponsor has `id, name, tier, description, websiteUrl, logoUrl`. |
+| `skills/techbash/data/tickets.json` | `{ event, source, fetchedAt, tickets[] }` — each ticket has `id, name, description, price, currency, saleStartsAt, saleEndsAt, isSoldOut, isAvailable`. |
+
+When answering sponsor/ticket questions:
+
+1. Read the JSON file from disk (relative to the plugin install). If the array is empty or `fetchedAt` is `null`, tell the user the snapshot hasn't been populated yet and link to <https://techbash.com> for sponsors or <https://techbash.zohobackstage.com/TechBash2026> for tickets.
+2. Always cite the `fetchedAt` timestamp so the user understands how fresh the data is.
+3. For ticket questions, never quote a price without the `currency`. If `isSoldOut` is true, lead with that fact.
+4. For **buying / transferring / refunding** tickets, direct the user to <https://techbash.zohobackstage.com/TechBash2026>. The skill does not perform ticket transactions.
 
 ## Core workflows
 
@@ -200,10 +222,26 @@ Stack: Node 22, TypeScript, Azure Functions, GitHub Actions
 4. Scaffold a minimal starter that matches: include a `README.md` that links back to the session and the speaker's profile.
 5. Note explicitly that the scaffold is inspired by the session description, not by attending — the user should still attend or watch the recording for full context.
 
+### "Who's sponsoring TechBash?" / "What sponsors are at TechBash this year?"
+
+1. Read `skills/techbash/data/sponsors.json`.
+2. If empty or `fetchedAt` is null, say "Sponsor list is not in the snapshot yet — see <https://techbash.com> for the current sponsor list." and stop.
+3. Group sponsors by `tier` (preserve any order present in the file; otherwise alphabetize by tier then by name).
+4. For each sponsor return name + one-line description (truncate longer descriptions) and the `websiteUrl` if present. Mention the `fetchedAt` timestamp at the bottom.
+
+### "What ticket types are available?" / "How much is a TechBash ticket?"
+
+1. Read `skills/techbash/data/tickets.json`.
+2. If empty or `fetchedAt` is null, say "Ticket data is not in the snapshot yet — see <https://techbash.zohobackstage.com/TechBash2026>." and stop.
+3. List ticket types with name, description (truncated), and price formatted as `<price> <currency>`.
+4. Flag any ticket where `isSoldOut === true` as **SOLD OUT** at the top of its entry.
+5. Mention the `fetchedAt` timestamp and always close with "To buy, transfer, or refund tickets, go to <https://techbash.zohobackstage.com/TechBash2026>."
+
 ## Guardrails
 
 - Never fabricate session IDs, titles, speakers, rooms, times, sponsors, or ticket prices.
 - If GridSmart is empty, say so plainly — do not guess at a schedule.
+- If a sponsor or ticket snapshot is empty / has a null `fetchedAt`, say so and link to the canonical source — do not invent entries.
 - If a Sessionize endpoint returns an error or empty array, surface that to the user and stop.
 - Ticketing and registration questions: link the user to <https://techbash.zohobackstage.com/TechBash2026>. Do not attempt to register them.
 - For venue, travel, hotel, and family-day logistics not in the Sessionize data, link the user to <https://techbash.com>.

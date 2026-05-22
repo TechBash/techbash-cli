@@ -1,0 +1,47 @@
+name: Refresh Zoho Backstage data
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why are you refreshing? (shows up in commit message)"
+        required: false
+        default: "manual refresh"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fetch from Zoho Backstage
+        env:
+          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_PORTAL_ID: ${{ vars.ZOHO_PORTAL_ID }}
+          ZOHO_EVENT_ID: ${{ vars.ZOHO_EVENT_ID }}
+          ZOHO_API_DOMAIN: ${{ vars.ZOHO_API_DOMAIN }}
+          ZOHO_ACCOUNTS_DOMAIN: ${{ vars.ZOHO_ACCOUNTS_DOMAIN }}
+        run: node scripts/fetch-zoho.mjs
+
+      - name: Commit changes (if any)
+        run: |
+          git config user.name "techbash-bot"
+          git config user.email "bot@techbash.com"
+          git add skills/techbash/data/sponsors.json skills/techbash/data/tickets.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(data): refresh Zoho snapshot (${{ inputs.reason }})"
+          git push

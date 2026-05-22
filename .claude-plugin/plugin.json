@@ -1,7 +1,7 @@
 {
   "name": "techbash",
   "description": "Connect your project to the TechBash 2026 session catalog — discover relevant talks, look up speakers, plan your schedule, and capture notes from your development environment.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "TechBash"
   },

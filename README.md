@@ -96,6 +96,7 @@ Full docs live in [`docs/`](./docs/README.md):
 - [Workflow recipes](./docs/workflows.md) — every supported workflow in detail
 - [Event reference](./docs/event.md) — dates, venue, tracks, travel
 - [FAQ](./docs/faq.md) — privacy, troubleshooting, limitations
+- [Zoho setup](./docs/zoho-setup.md) — maintainers: refresh sponsor + ticket snapshots
 
 ## Contributing
 

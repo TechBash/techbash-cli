@@ -35,10 +35,19 @@ The Sessionize endpoint ID `hppwa4hg` is event-specific. When TechBash rolls for
 
 The `GridSmart` endpoint may return an empty grid until organizers publish the schedule. Skill behavior must degrade gracefully: report "schedule not yet published" rather than fabricating times or rooms, and continue to return session/speaker data from the other endpoints.
 
+## Sponsor and ticket data (Zoho Backstage)
+
+Sponsor and ticket data come from a maintainer-run GitHub Action (`.github/workflows/refresh-zoho-data.yml`) that calls Zoho Backstage and commits sanitized JSON to `skills/techbash/data/sponsors.json` and `skills/techbash/data/tickets.json`. The skill reads those snapshots — it never talks to Zoho directly, and end-user machines never need Zoho credentials.
+
+When changing the fetch script or the snapshot shape:
+
+- Keep `fetch-zoho.mjs` allowlist-only — never echo unknown fields from Zoho into the snapshot.
+- If you add a new field to a snapshot, document it in `skills/techbash/SKILL.md` (the "Sponsor and ticket data" table) so the model knows about it.
+- Zoho credentials live as repo secrets (`ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`) and repo vars (`ZOHO_PORTAL_ID`, `ZOHO_EVENT_ID`, optional `ZOHO_API_DOMAIN` / `ZOHO_ACCOUNTS_DOMAIN`) — never committed. See `docs/zoho-setup.md`.
+
 ## Future scope
 
 - `@techbash/events-cli` Node helper for local caching and fuzzy search (mirrors `@microsoft/events-cli`).
-- Zoho Backstage integration for sponsors + ticketing. Credentials must be loaded from `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` env vars — never committed.
 
 ## General principles
 

@@ -223,3 +223,27 @@ This forces a re-fetch on the next request.
 - **Invent data.** If a session has no room or time yet, it says "schedule not yet published" rather than guessing.
 - **Modify the catalog.** It's read-only against Sessionize.
 - **Save anything to disk without asking.** Note logging is the one exception — and only the file you named.
+
+---
+
+## Who's sponsoring TechBash? / What ticket types are available?
+
+**Ask:**
+
+```text
+Who's sponsoring TechBash this year?
+What ticket types are available for TechBash?
+How much is a TechBash workshop-day ticket?
+```
+
+**What happens:**
+
+The assistant reads a committed JSON snapshot under `skills/techbash/data/` — `sponsors.json` and `tickets.json`. These are refreshed manually by TechBash organizers via a GitHub Action, so the data can be slightly out of date. The assistant will always tell you the snapshot timestamp (`fetchedAt`) so you know how fresh the answer is.
+
+If the snapshot is empty (the organizers haven't run the refresh action yet), the assistant says so plainly and points you at the canonical source: <https://techbash.com> for sponsors, <https://techbash.zohobackstage.com/TechBash2026> for tickets.
+
+**Limitations:**
+
+- **Not real-time.** Sold-out / availability flags reflect the last refresh.
+- **Read-only.** The skill cannot buy, transfer, or refund tickets — that's always a hand-off to the Zoho Backstage page.
+- **Organizer responsibility.** Refreshing the snapshot is a maintainer action documented in [`docs/zoho-setup.md`](./zoho-setup.md).

@@ -13,6 +13,7 @@ The TechBash CLI is a [GitHub Copilot CLI](https://github.com/features/copilot/c
 | [Workflow recipes](./workflows.md) | Detailed "how do I…" recipes for every supported workflow. |
 | [Event reference](./event.md) | Dates, venue, tracks, family day, workshop day, travel pointers. |
 | [FAQ](./faq.md) | Common questions: empty schedule, privacy, refreshing data, ticketing. |
+| [Zoho setup](./zoho-setup.md) | **Maintainers only** — refresh sponsor + ticket snapshots. |
 
 ## What the skill does (one paragraph)
 

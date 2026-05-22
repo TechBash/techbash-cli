@@ -106,11 +106,15 @@ No. Ticketing is handled by Zoho Backstage. The skill will link you to <https://
 
 ### Can the skill show me sponsors?
 
-Not yet. Sponsor data via the Zoho Backstage API is on the roadmap for a future release. For now, see <https://techbash.com> for the current sponsor list.
+Yes, in v0.2+. Sponsor data is refreshed manually by TechBash organizers and committed to the repo as a JSON snapshot, so it may be slightly stale (the skill always tells you the snapshot timestamp). Ask: *"Who's sponsoring TechBash?"* For the always-current list see <https://techbash.com>.
+
+### Can the skill show me ticket types and prices?
+
+Yes, in v0.2+. Like sponsors, ticket data is a manually refreshed snapshot. Ask: *"What ticket types are available for TechBash?"* The skill will list types and prices and link you to <https://techbash.zohobackstage.com/TechBash2026> for the actual purchase.
 
 ### Can the skill check seat availability for a workshop?
 
-Not yet — same reason. Workshop registration and availability come from Zoho Backstage, which isn't wired up in v0.1.
+Not directly — workshops are sessions in Sessionize, not separate tickets in Zoho. If a workshop is sold out or has a waitlist, that information lives on the Zoho ticketing page.
 
 ---
 
