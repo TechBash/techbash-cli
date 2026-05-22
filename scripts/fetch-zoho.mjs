@@ -119,8 +119,9 @@ function pickArray(payload) {
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.data)) return payload.data;
   if (Array.isArray(payload?.sponsors)) return payload.sponsors;
+  if (Array.isArray(payload?.ticket_classes)) return payload.ticket_classes;
+  if (Array.isArray(payload?.ticketClasses)) return payload.ticketClasses;
   if (Array.isArray(payload?.tickets)) return payload.tickets;
-  if (Array.isArray(payload?.eventTickets)) return payload.eventTickets;
   return [];
 }
 
@@ -141,7 +142,7 @@ async function main() {
 
   console.log("Fetching tickets…");
   const ticketsRaw = await zohoGet(
-    `/portals/${portalId}/events/${eventId}/tickets`,
+    `/portals/${portalId}/events/${eventId}/ticket_classes`,
     token,
   );
 

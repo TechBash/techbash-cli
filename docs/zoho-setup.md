@@ -112,7 +112,7 @@ Repo → **Actions** → **Refresh Zoho Backstage data** → **Run workflow**. P
 The action will:
 
 1. Mint a fresh access token from your refresh token.
-2. Fetch sponsors and tickets.
+2. Fetch sponsors (`/portals/{portal}/events/{event}/sponsors`) and ticket classes (`/portals/{portal}/events/{event}/ticket_classes`).
 3. Allowlist-sanitize the response (only known-safe fields are kept).
 4. Write `skills/techbash/data/sponsors.json` and `tickets.json`.
 5. Commit and push the diff if anything changed.
