@@ -94,6 +94,7 @@ Full docs live in [`docs/`](./docs/README.md):
 - [Installation](./docs/installation.md) — Copilot CLI, Claude Code, manual install
 - [Getting started](./docs/getting-started.md) — your first 5 minutes
 - [Workflow recipes](./docs/workflows.md) — every supported workflow in detail
+- [Notes & trip reports](./docs/notes-and-trip-reports.md) — capture and synthesize what you learned
 - [Event reference](./docs/event.md) — dates, venue, tracks, travel
 - [FAQ](./docs/faq.md) — privacy, troubleshooting, limitations
 - [Zoho setup](./docs/zoho-setup.md) — maintainers: refresh sponsor + ticket snapshots

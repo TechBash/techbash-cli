@@ -145,18 +145,24 @@ Action: try this on the new dashboard wireframes Monday.
 
 1. The assistant fuzzy-matches the session title (or accepts an ID).
 2. If the match is ambiguous, it confirms with you before writing.
-3. It appends an entry to `./techbash-notes.md` in your current directory, creating the file if needed:
+3. It appends a structured entry — with YAML frontmatter (`session_id`, `title`, `speaker`, `track`, `room`, `day`, optional `rating`) plus sections for **Key takeaways**, **Quotes / code**, **Action items**, **Follow-ups**, and **Raw notes** — to `./techbash-notes.md` in your current directory. Entries are separated by `---`. The file is never overwritten.
 
-   ```markdown
-   ## 2026-10-14T11:32:00-04:00 — From Idea to Design for Non-Designers
-   **Speaker(s):** Abbey Perini
-   **Room:** n/a
+**Privacy:** the notes file is local. The assistant only reads it when you explicitly ask for a daily rollup, summary, or trip report.
 
-   The five-step framework slide is the takeaway. Photo on my phone.
-   Action: try this on the new dashboard wireframes Monday.
-   ```
+For the full template shape and editing rules, see [Notes & trip reports](./notes-and-trip-reports.md).
 
-**Privacy:** the notes file is local. The assistant only reads it when you explicitly ask for a summary or trip report.
+---
+
+## Wrap up your day (daily rollup)
+
+**Ask:**
+
+```text
+Wrap up my TechBash Thursday.
+Daily rollup for today.
+```
+
+The assistant reads that day's session notes, synthesizes themes, lists the action items you captured, and asks you for the highlight of the day. The rollup is appended to the same `techbash-notes.md` so everything stays in one file. It also prompts you (with a consent reminder) for any people you'd like to remember meeting that day.
 
 ---
 
@@ -170,7 +176,9 @@ Draft a trip-report blog post from my TechBash notes.
 Pull the action items out of my TechBash notes into a checklist.
 ```
 
-The assistant reads `./techbash-notes.md`, groups by theme or day, surfaces recurring topics, and pulls concrete next steps to the top. For a blog draft it will offer to save the result to a new file — it won't overwrite anything without confirmation.
+The assistant parses every entry's frontmatter, groups by track and day, surfaces your top-rated sessions, and aggregates every `- [ ]` action item into a single table. You'll be asked who the audience is (team, manager, blog) so it can match the tone. The draft is shown first; on accept it lands at `./techbash-trip-report.md` — and if that file already exists, it writes `techbash-trip-report-2.md` instead of overwriting.
+
+See [Notes & trip reports](./notes-and-trip-reports.md) for the full report layout.
 
 ---
 

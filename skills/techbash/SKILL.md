@@ -20,7 +20,7 @@ compatibility: >-
   per conversation and filter in-context.
 metadata:
   author: TechBash organizers
-  version: "0.2"
+  version: "0.3"
   domain: techbash
 ---
 
@@ -196,23 +196,35 @@ Stack: Node 22, TypeScript, Azure Functions, GitHub Actions
 ### "Log a note from \<session\>"
 
 1. Resolve the session by title (fuzzy match) or by ID. Confirm the match with the user if ambiguous.
-2. Append to `./techbash-notes.md` in the current working directory, creating the file if it doesn't exist. Use this entry shape:
+2. Load the template at `skills/techbash/templates/session-note.md` (relative to the plugin install). Substitute the `{{...}}` placeholders with what you know from Sessionize (`session_id`, `title`, `speaker`, `track`, `room`, `day`, `starts_at`) and from the user's words (`notes`, `takeaway_1`, `action_item_1`, optional `rating`, etc.). Leave any placeholder you genuinely don't know as an empty value rather than guessing — never fabricate a speaker, room, or time.
+3. Append the filled template to `./techbash-notes.md` in the user's current working directory, preceded by a `---` separator if the file already has content. Create the file if it doesn't exist. **Never overwrite.**
+4. Confirm what was written and where, and offer to capture more notes for the same session in a follow-up turn.
 
-   ```markdown
-   ## <ISO timestamp> — <Session title>
-   **Speaker(s):** <names>
-   **Room:** <room or "n/a">
+### "Wrap up my TechBash day" / "Daily rollup"
 
-   <user's note>
-   ```
-
-3. Confirm what was written and where.
+1. Read `./techbash-notes.md` and extract entries whose frontmatter `day` matches the day the user is wrapping up (ask if not clear).
+2. Load `skills/techbash/templates/daily-rollup.md`. Fill in:
+   - `day` and `date` from context
+   - `sessions_attended` = count of session-note entries for that day
+   - `best_session_title` / `best_session_speaker` — ask the user if not obvious from ratings
+   - `theme_1` etc. — synthesize from the day's `## Key takeaways` sections
+   - `try_at_work_1` etc. — pull from the day's `## Action items`
+3. **Always** keep the consent reminder line about contacts in the rendered output.
+4. Append the filled rollup to `./techbash-notes.md` (same file, separated by `---`). Confirm what was written.
 
 ### "Summarize my TechBash notes" / "Draft a trip report"
 
-1. Read `./techbash-notes.md` if it exists.
-2. Group by track or by day, surface recurring themes, and call out concrete next steps the user wrote down.
-3. For a trip-report draft, offer to save the result to a new file but do not overwrite existing files without confirmation.
+1. Read `./techbash-notes.md`. If it doesn't exist or has no session-note entries, tell the user and stop.
+2. Parse entries by their YAML frontmatter (`type` distinguishes `daily-rollup` from session notes; if absent, treat as a session note). Group session notes by `track` and by `day`.
+3. Load `skills/techbash/templates/trip-report.md` and fill it in:
+   - `dates` = span derived from session-note `day` values
+   - `top_session_*` = top 3 by `rating` (ties broken by user preference)
+   - `themes` = synthesized across all `## Key takeaways`
+   - `action_items` table = aggregate every `- [ ]` action item across notes; ask the user for `owner` and `due` if not present
+   - `people_to_keep_in_touch_with` = aggregate from daily-rollup `## People I met` sections **only** — do not invent
+   - `appendix` = one bullet per session-note entry, formatted as `- [Day] Title — Speaker (rating/5)`
+4. Offer to save the result as `./techbash-trip-report.md`. **Confirm before writing**, and never overwrite an existing file without explicit permission (offer a numbered variant like `techbash-trip-report-2.md` instead).
+5. Remind the user that anything pulled from speakers' talks should credit the speaker if reshared publicly.
 
 ### "Scaffold a project from \<session\>"
 

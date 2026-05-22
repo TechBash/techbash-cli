@@ -11,6 +11,7 @@ The TechBash CLI is a [GitHub Copilot CLI](https://github.com/features/copilot/c
 | [Installation](./installation.md) | First time setup — install the plugin in Copilot CLI or Claude Code. |
 | [Getting started](./getting-started.md) | Your first 5 minutes — ask your first questions and see what comes back. |
 | [Workflow recipes](./workflows.md) | Detailed "how do I…" recipes for every supported workflow. |
+| [Notes and trip reports](./notes-and-trip-reports.md) | Capture session notes during the event and draft a structured trip report after. |
 | [Event reference](./event.md) | Dates, venue, tracks, family day, workshop day, travel pointers. |
 | [FAQ](./faq.md) | Common questions: empty schedule, privacy, refreshing data, ticketing. |
 | [Zoho setup](./zoho-setup.md) | **Maintainers only** — refresh sponsor + ticket snapshots. |
