@@ -156,10 +156,35 @@ async function main() {
   const token = await mintAccessToken();
 
   console.log("Fetching sponsors…");
-  const sponsorsRaw = await zohoGet(
+  const sponsorsListRaw = await zohoGet(
     `/portals/${portalId}/events/${eventId}/sponsors`,
     token,
   );
+
+  // The list endpoint returns abbreviated records — in particular `description`
+  // tends to come back duplicated across sponsors. Fetch each sponsor's detail
+  // endpoint to get the real per-sponsor fields, falling back to the list row
+  // if the detail call fails.
+  const sponsorsList = pickArray(sponsorsListRaw);
+  const sponsorsRaw = [];
+  for (const row of sponsorsList) {
+    if (!row?.id) {
+      sponsorsRaw.push(row);
+      continue;
+    }
+    try {
+      const detail = await zohoGet(
+        `/portals/${portalId}/events/${eventId}/sponsors/${row.id}`,
+        token,
+      );
+      sponsorsRaw.push(detail?.sponsor ?? detail ?? row);
+    } catch (err) {
+      console.warn(
+        `  ! detail fetch failed for sponsor ${row.id}: ${err.message} — falling back to list row`,
+      );
+      sponsorsRaw.push(row);
+    }
+  }
 
   console.log("Fetching tickets…");
   const ticketsRaw = await zohoGet(
@@ -173,7 +198,7 @@ async function main() {
     event: "TechBash 2026",
     source: "Zoho Backstage v3",
     fetchedAt,
-    sponsors: pickArray(sponsorsRaw).map(sanitizeSponsor),
+    sponsors: sponsorsRaw.map(sanitizeSponsor),
   };
 
   const tickets = {
