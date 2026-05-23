@@ -6,19 +6,22 @@ This project follows [Semantic Versioning](https://semver.org/) and
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-05-22
+
 ### Added
 - `scripts/validate.mjs` — repo validator that runs in CI and locally.
 - `.github/workflows/ci.yml` — runs validation on every push and PR.
 - `.github/workflows/release.yml` — cuts a GitHub Release on `vX.Y.Z` tag push.
 - This `CHANGELOG.md`.
 
-## [0.3.1] — 2026-05-22
-
 ### Fixed
 - SKILL.md now correctly documents Sessionize `GridSmart` times as UTC
   (not ET), with explicit `America/New_York` conversion guidance.
 - Agenda and now/next workflows traverse the real
   `days[].rooms[].sessions[]` shape and dedupe plenary sessions.
+- `scripts/fetch-zoho.mjs` follows each sponsor's list row with a
+  `GET /sponsors/{id}` detail call, since the Zoho list endpoint
+  returns a duplicated description for every sponsor.
 
 ## [0.3.0] — 2026-05-22
 
