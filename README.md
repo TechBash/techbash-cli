@@ -1,5 +1,7 @@
 # TechBash CLI
 
+[![CI](https://github.com/TechBash/techbash-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/TechBash/techbash-cli/actions/workflows/ci.yml)
+
 A [GitHub Copilot CLI](https://github.com/features/copilot/cli/) skill that connects your local project to the **TechBash 2026** session catalog. Find sessions relevant to your stack, look up speakers, plan your schedule, and capture notes — all from your terminal.
 
 > **TechBash 2026** — Oct 13–16, 2026 · Kalahari Resort & Convention Center, Pocono Manor, PA · <https://techbash.com>

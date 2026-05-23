@@ -16,8 +16,18 @@ The repo publishes plugin metadata for GitHub Copilot CLI and Claude Code. Keep 
 ## Sync rules
 
 - Treat `skills/techbash/SKILL.md` as the product contract for catalog behavior. Never invent session IDs, titles, speakers, or schedules — always fetch them from the live Sessionize endpoints listed in the skill.
-- Versioning gate: any meaningful change to `SKILL.md` (agent behavior, commands or workflows agents may follow, endpoint usage, or user-facing guidance) must bump both versioned plugin manifests to the same value. Patch bumps are fine for guidance-only changes.
+- Versioning gate: any meaningful change to `SKILL.md` (agent behavior, commands or workflows agents may follow, endpoint usage, or user-facing guidance) must bump both versioned plugin manifests to the same value. Patch bumps are fine for guidance-only changes. The CI validator (`scripts/validate.mjs`) enforces that all three versions stay in sync.
 - Keep `README.md` install/client guidance aligned with plugin manifest or skill changes.
+- Add a CHANGELOG.md entry under `[Unreleased]` for every change that ships.
+
+## Releasing
+
+1. Move pending entries from `[Unreleased]` into a new `[X.Y.Z]` section in `CHANGELOG.md`, dated today.
+2. Bump `version` in both `.claude-plugin/plugin.json` and `.github/plugin/plugin.json`, and the `metadata.version` in `skills/techbash/SKILL.md`. All three must match.
+3. Run `node scripts/validate.mjs` locally — it must pass.
+4. Commit and push to `main`. CI runs the same validator on the push.
+5. Tag the release: `git tag vX.Y.Z && git push --tags`.
+6. The Release workflow validates again, asserts the tag matches the manifest version, then creates a GitHub Release with auto-generated notes.
 
 ## Sessionize endpoints (TechBash 2026)
 
