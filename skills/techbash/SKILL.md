@@ -20,7 +20,7 @@ compatibility: >-
   per conversation and filter in-context.
 metadata:
   author: TechBash organizers
-  version: "0.3"
+  version: "0.3.1"
   domain: techbash
 ---
 
@@ -63,8 +63,8 @@ Key fields from the Sessions / All views:
 | `description` | Full abstract (markdown-ish; may contain `\r\n`) |
 | `speakers[]` | Array of `{ id, name }` — join to the Speakers view for bios/links |
 | `categories[]` | Track/level/format tags (may be empty pre-publish) |
-| `room` / `roomId` | `null` until the schedule is published |
-| `startsAt` / `endsAt` | ISO timestamps in ET; `null` until the schedule is published |
+| `room` / `roomId` | `null` until the schedule is published; populated from GridSmart once the grid is live |
+| `startsAt` / `endsAt` | ISO 8601 timestamps in **UTC** (e.g. `2025-11-04T14:00:00Z` = 10:00 EDT); `null` until the schedule is published. Always convert to Eastern Time before showing to the user. |
 | `status` | `Accepted` for confirmed sessions |
 | `isServiceSession` | `true` for non-talk slots (meals, breaks, family-day activities) |
 
@@ -74,6 +74,53 @@ Key fields from the Sessions / All views:
 | --- | --- |
 | `id` (GUID) | Use to join from session `speakers[].id` |
 | `fullName`, `firstName`, `lastName`, `tagLine`, `bio` | Display fields |
+
+### GridSmart (schedule) shape
+
+When published, GridSmart returns an array of day objects. Until then it returns `[]` — handle that case before trying to index into anything.
+
+```jsonc
+[
+  {
+    "date": "2026-10-13T00:00:00Z",   // day bucket (UTC midnight)
+    "isDefault": false,
+    "rooms": [
+      {
+        "id": 60694,
+        "name": "Sagewood",
+        "hasOnlyPlenumSessions": false,
+        "sessions": [
+          {
+            "id": "919802",
+            "title": "...",
+            "description": "...",
+            "startsAt": "2026-10-13T14:00:00Z",   // ALWAYS UTC ("Z" suffix)
+            "endsAt":   "2026-10-13T17:30:00Z",
+            "isServiceSession": false,            // meals / breaks / registration
+            "isPlenumSession": false,             // keynote / plenary
+            "speakers": [{ "id": "<guid>", "name": "Chris Ayers" }],
+            "categories": [],
+            "roomId": 60694,
+            "room": "Sagewood",
+            "liveUrl": null,
+            "recordingUrl": null,                 // populated post-event when uploads land
+            "status": "Accepted",
+            "isInformed": true,
+            "isConfirmed": true
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+
+Notes:
+
+- Times are **UTC**. Always convert to Eastern Time (America/New_York, which is EDT during TechBash week) before displaying. Eastern Time observes DST; the offset is `-04:00` in October.
+- `isServiceSession: true` marks meals, breaks, registration, and family-day activities — exclude these from "what talks are on?" answers unless the user explicitly asks.
+- `isPlenumSession: true` marks keynotes / shared sessions; they typically appear in every room's `sessions[]` or in a single dedicated room. Deduplicate by session `id`.
+- `liveUrl` / `recordingUrl` are usually `null` during the event; the recording URL is populated days-to-weeks after the conference.
 | `profilePicture` | URL to the headshot |
 | `sessions[]` | `{ id, name }` — reverse index back to sessions |
 | `links[]` | `{ title, url, linkType }` — Twitter / LinkedIn / Blog / Company_Website / etc. |
@@ -184,14 +231,15 @@ Stack: Node 22, TypeScript, Azure Functions, GitHub Actions
 
 1. Run the matching workflow above to pick recommended sessions.
 2. Fetch GridSmart.
-3. If GridSmart is empty (no `startSlot`/`rooms`), tell the user the schedule isn't published yet and offer to save the un-timed picks as a markdown shortlist.
-4. If GridSmart has data, build a per-day itinerary, flag conflicts, and offer to save as `techbash-agenda.md` (and, on request, `techbash-agenda.ics`). Do not write files until the user confirms.
+3. If GridSmart is `[]` (empty array), tell the user the schedule isn't published yet and offer to save the un-timed picks as a markdown shortlist.
+4. If GridSmart has data, build a per-day itinerary by iterating each day's `rooms[].sessions[]`, deduplicating sessions that appear in multiple rooms (e.g. plenary sessions), converting `startsAt`/`endsAt` from UTC to Eastern Time, flagging conflicts where the user's picks overlap, and excluding `isServiceSession: true` entries unless asked. Offer to save as `techbash-agenda.md` (and, on request, `techbash-agenda.ics`). Do not write files until the user confirms.
 
 ### "What's happening now?" / "What's next in \<room\>?"
 
-1. Fetch GridSmart. If empty, report "schedule not yet published".
-2. Compare the current time (Eastern Time) to session `startsAt`/`endsAt`.
-3. Return the matching session(s) with title, speaker, room, and remaining time.
+1. Fetch GridSmart. If `[]`, report "schedule not yet published" and stop.
+2. Get the current time in Eastern Time, convert it to UTC for comparison against session `startsAt`/`endsAt`.
+3. Walk every day's `rooms[].sessions[]`, deduplicating by session `id` (plenary sessions can appear in multiple rooms). Exclude `isServiceSession: true` unless the user asked about meals/breaks specifically.
+4. Return the matching session(s) with title, speaker, room (display the room `name`, not the `roomId`), and remaining time — formatted in Eastern Time, e.g. "ends at 3:30 PM ET (32 min left)".
 
 ### "Log a note from \<session\>"
 
