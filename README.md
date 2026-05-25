@@ -28,6 +28,8 @@ A [GitHub Copilot CLI](https://github.com/features/copilot/cli/) skill that conn
 
 The skill reads `package.json`, `requirements.txt`, `*.csproj`, `go.mod`, and other dependency files, maps them to topics, and searches the live TechBash 2026 catalog hosted on Sessionize.
 
+![TechBash CLI logo](./images/techbash-cli-logo.png)
+
 ## What You Can Do
 
 ### Before TechBash — plan your trip
